@@ -1031,8 +1031,21 @@ Jetlica,14.1,52,9.1</pre>
             const dateDisplay = dateObj.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             document.getElementById('dailyDateDisplay').textContent = dateDisplay;
             
-            // Filter data for selected date
-            const dailyData = allData.filter(e => e.date === selectedDate);
+            // Filter data for selected date - handle different date formats
+            const dailyData = allData.filter(e => {
+                if (!e.date) return false;
+                
+                // Try to extract just the date part from the entry
+                let entryDate = e.date;
+                
+                // If the entry date has a timestamp (T in it), extract just the date part
+                if (entryDate.includes('T')) {
+                    entryDate = entryDate.split('T')[0];
+                }
+                
+                // Compare dates
+                return entryDate === selectedDate;
+            });
             
             if (dailyData.length === 0) {
                 document.getElementById('dailyContent').innerHTML = `<div class="no-data">No EOD entries for ${dateDisplay}</div>`;
