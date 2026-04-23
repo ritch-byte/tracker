@@ -647,13 +647,13 @@
                 </div>
                 <div>
                     <label style="font-size: 13px; font-weight: 600; color: #1e3c72; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 0.5rem;">Select Week (Optional)</label>
-                    <select id="dashboardWeek" class="form-select" onchange="updateDashboard()" style="width: 200px;">
+                    <select id="dashboardWeek" class="form-select" onchange="updateDashboard()" style="width: 100%; max-width: 300px;">
                         <option value="">All Weeks</option>
-                        <option value="week1">Week 1</option>
-                        <option value="week2">Week 2</option>
-                        <option value="week3">Week 3</option>
-                        <option value="week4">Week 4</option>
-                        <option value="week5">Week 5</option>
+                        <option value="week1">Week 1 (Apr 1-5)</option>
+                        <option value="week2">Week 2 (Apr 6-12)</option>
+                        <option value="week3">Week 3 (Apr 13-19)</option>
+                        <option value="week4">Week 4 (Apr 20-26)</option>
+                        <option value="week5">Week 5 (Apr 27-30)</option>
                     </select>
                 </div>
                 <div style="color: #6b7280; font-size: 13px;">
@@ -670,12 +670,12 @@
                 
                 <div class="goal-stats">
                     <div class="goal-stat">
-                        <div class="goal-stat-label">Target BDCs</div>
+                        <div class="goal-stat-label">Target DCs</div>
                         <div class="goal-stat-value" id="goalAmount">-</div>
                     </div>
                     <div class="goal-stat">
-                        <div class="goal-stat-label">Actual BDCs</div>
-                        <div class="goal-stat-value" id="actualBDCs">0</div>
+                        <div class="goal-stat-label">Actual DCs</div>
+                        <div class="goal-stat-value" id="actualDCs">0</div>
                     </div>
                     <div class="goal-stat">
                         <div class="goal-stat-label">Progress</div>
@@ -693,15 +693,15 @@
             <div id="goalModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4);">
                 <div style="background-color: white; margin: 10% auto; padding: 2rem; border-radius: 8px; width: 90%; max-width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
                     <span style="float: right; font-size: 24px; font-weight: bold; color: #9ca3af; cursor: pointer; transition: all 0.2s;" onclick="closeGoalModal()">&times;</span>
-                    <div style="font-size: 18px; font-weight: 600; color: #1e3c72; margin-bottom: 1.5rem;">Set Monthly BDC Goal</div>
+                    <div style="font-size: 18px; font-weight: 600; color: #1e3c72; margin-bottom: 1.5rem;">Set Monthly DC Goal</div>
                     
                     <div style="margin-bottom: 1.5rem;">
                         <label style="font-size: 13px; font-weight: 600; color: #1e3c72; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 0.5rem;">Month: <span id="modalMonthDisplay">April 2026</span></label>
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Target BDCs for this month</label>
-                        <input type="number" id="goalInput" class="form-input" placeholder="Enter target BDCs (e.g., 100)" min="0">
+                        <label class="form-label">Target DCs for this month</label>
+                        <input type="number" id="goalInput" class="form-input" placeholder="Enter target DCs (e.g., 100)" min="0">
                     </div>
                     
                     <div style="display: flex; gap: 1rem; margin-top: 2rem;">
@@ -713,8 +713,8 @@
             
             <div class="metrics-grid">
                 <div class="metric-card">
-                    <div class="metric-label">Total BDCs</div>
-                    <div class="metric-value" id="totalBDC">0</div>
+                    <div class="metric-label">Total DCs</div>
+                    <div class="metric-value" id="totalDC">0</div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">Total Coaching</div>
@@ -736,7 +736,7 @@
                     <div class="team-header">
                         <div class="team-name">RitchCent</div>
                         <div class="team-stat">
-                            <span class="team-stat-label" id="bdcLabelRitchCent">Month BDCs:</span>
+                            <span class="team-stat-label" id="bdcLabelRitchCent">Month DCs:</span>
                             <span class="team-stat-value" id="bdcRitchCent">0</span>
                         </div>
                         <div class="team-stat">
@@ -766,7 +766,7 @@
                     <div class="team-header">
                         <div class="team-name">Jumhon</div>
                         <div class="team-stat">
-                            <span class="team-stat-label" id="bdcLabelJumhon">Month BDCs:</span>
+                            <span class="team-stat-label" id="bdcLabelJumhon">Month DCs:</span>
                             <span class="team-stat-value" id="bdcJumhon">0</span>
                         </div>
                         <div class="team-stat">
@@ -796,7 +796,7 @@
                     <div class="team-header">
                         <div class="team-name">Jetlica</div>
                         <div class="team-stat">
-                            <span class="team-stat-label" id="bdcLabelJetlica">Month BDCs:</span>
+                            <span class="team-stat-label" id="bdcLabelJetlica">Month DCs:</span>
                             <span class="team-stat-value" id="bdcJetlica">0</span>
                         </div>
                         <div class="team-stat">
@@ -892,7 +892,7 @@ Jetlica,14.1,52,9.1</pre>
             <h2>Performance Reports & Analytics</h2>
             
             <div class="chart-container">
-                <h3>📊 BDCs by Team</h3>
+                <h3>📊 DCs by Team</h3>
                 <div class="chart-wrapper">
                     <canvas id="bdcChart"></canvas>
                 </div>
@@ -914,7 +914,7 @@ Jetlica,14.1,52,9.1</pre>
                             <th>Team Leader</th>
                             <th>Team</th>
                             <th>Coaching Sessions</th>
-                            <th>BDC Contribution</th>
+                            <th>DC Contribution</th>
                         </tr>
                     </thead>
                     <tbody id="rankingBody"></tbody>
@@ -944,7 +944,7 @@ Jetlica,14.1,52,9.1</pre>
                         <th>Date</th>
                         <th>Team</th>
                         <th>Leader</th>
-                        <th>BDCs</th>
+                        <th>DCs</th>
                         <th>Coaching</th>
                         <th>Highlights</th>
                         <th>Lowlights</th>
@@ -1077,7 +1077,7 @@ Jetlica,14.1,52,9.1</pre>
                             
                             <div style="margin-bottom: 1.5rem;">
                                 <div class="daily-bdc-highlight">
-                                    ${entry.bdc} BDCs
+                                    ${entry.bdc} DCs
                                 </div>
                                 <div style="font-size: 12px; color: #6b7280;">Booked Discovery Calls</div>
                             </div>
@@ -1133,11 +1133,11 @@ Jetlica,14.1,52,9.1</pre>
             if (selectedWeek) {
                 periodText = 'This Week';
                 let startDay, endDay;
-                if (selectedWeek === 'week1') { startDay = 1; endDay = 7; }
-                else if (selectedWeek === 'week2') { startDay = 8; endDay = 14; }
-                else if (selectedWeek === 'week3') { startDay = 15; endDay = 21; }
-                else if (selectedWeek === 'week4') { startDay = 22; endDay = 28; }
-                else if (selectedWeek === 'week5') { startDay = 29; endDay = 30; }
+                if (selectedWeek === 'week1') { startDay = 1; endDay = 5; }
+                else if (selectedWeek === 'week2') { startDay = 6; endDay = 12; }
+                else if (selectedWeek === 'week3') { startDay = 13; endDay = 19; }
+                else if (selectedWeek === 'week4') { startDay = 20; endDay = 26; }
+                else if (selectedWeek === 'week5') { startDay = 27; endDay = 30; }
                 
                 const monthNum = selectedMonth.split('-')[1];
                 const monthAbbr = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][parseInt(monthNum)];
@@ -1153,7 +1153,7 @@ Jetlica,14.1,52,9.1</pre>
             // Update team card labels
             const periodLabel = selectedWeek ? 'Week' : 'Month';
             ['RitchCent', 'Jumhon', 'Jetlica'].forEach(team => {
-                document.getElementById(`bdcLabel${team}`).textContent = `${periodLabel} BDCs:`;
+                document.getElementById(`bdcLabel${team}`).textContent = `${periodLabel} DCs:`;
                 document.getElementById(`coachingLabel${team}`).textContent = `${periodLabel} Coaching:`;
             });
             
@@ -1166,20 +1166,20 @@ Jetlica,14.1,52,9.1</pre>
                     const date = new Date(e.date);
                     const dayOfMonth = date.getDate();
                     
-                    if (selectedWeek === 'week1') return dayOfMonth >= 1 && dayOfMonth <= 7;
-                    if (selectedWeek === 'week2') return dayOfMonth >= 8 && dayOfMonth <= 14;
-                    if (selectedWeek === 'week3') return dayOfMonth >= 15 && dayOfMonth <= 21;
-                    if (selectedWeek === 'week4') return dayOfMonth >= 22 && dayOfMonth <= 28;
-                    if (selectedWeek === 'week5') return dayOfMonth >= 29;
+                    if (selectedWeek === 'week1') return dayOfMonth >= 1 && dayOfMonth <= 5;
+                    if (selectedWeek === 'week2') return dayOfMonth >= 6 && dayOfMonth <= 12;
+                    if (selectedWeek === 'week3') return dayOfMonth >= 13 && dayOfMonth <= 19;
+                    if (selectedWeek === 'week4') return dayOfMonth >= 20 && dayOfMonth <= 26;
+                    if (selectedWeek === 'week5') return dayOfMonth >= 27;
                     return true;
                 });
             }
             
-            const totalBDC = filtered.reduce((sum, e) => sum + e.bdc, 0);
+            const totalDC = filtered.reduce((sum, e) => sum + e.bdc, 0);
             const totalCoaching = filtered.reduce((sum, e) => sum + e.coaching, 0);
             const teams = new Set(filtered.map(e => e.team)).size;
             
-            document.getElementById('totalBDC').textContent = totalBDC;
+            document.getElementById('totalDC').textContent = totalDC;
             document.getElementById('totalCoaching').textContent = totalCoaching;
             document.getElementById('totalEntries').textContent = filtered.length;
             document.getElementById('activeTeams').textContent = teams;
@@ -1232,7 +1232,7 @@ Jetlica,14.1,52,9.1</pre>
                 document.getElementById(`leaders${team}`).innerHTML = leadersHtml || '<div class="no-data">No data</div>';
             });
             
-            updateGoalDisplay(selectedMonth, totalBDC);
+            updateGoalDisplay(selectedMonth, totalDC);
         }
         
         function generateReports() {
@@ -1247,11 +1247,11 @@ Jetlica,14.1,52,9.1</pre>
                     const date = new Date(e.date);
                     const dayOfMonth = date.getDate();
                     
-                    if (selectedWeek === 'week1') return dayOfMonth >= 1 && dayOfMonth <= 7;
-                    if (selectedWeek === 'week2') return dayOfMonth >= 8 && dayOfMonth <= 14;
-                    if (selectedWeek === 'week3') return dayOfMonth >= 15 && dayOfMonth <= 21;
-                    if (selectedWeek === 'week4') return dayOfMonth >= 22 && dayOfMonth <= 28;
-                    if (selectedWeek === 'week5') return dayOfMonth >= 29;
+                    if (selectedWeek === 'week1') return dayOfMonth >= 1 && dayOfMonth <= 5;
+                    if (selectedWeek === 'week2') return dayOfMonth >= 6 && dayOfMonth <= 12;
+                    if (selectedWeek === 'week3') return dayOfMonth >= 13 && dayOfMonth <= 19;
+                    if (selectedWeek === 'week4') return dayOfMonth >= 20 && dayOfMonth <= 26;
+                    if (selectedWeek === 'week5') return dayOfMonth >= 27;
                     return true;
                 });
             }
@@ -1277,7 +1277,7 @@ Jetlica,14.1,52,9.1</pre>
                 data: {
                     labels: ['RitchCent', 'Jumhon', 'Jetlica'],
                     datasets: [{
-                        label: 'Total BDCs',
+                        label: 'Total DCs',
                         data: [bdcData.RitchCent, bdcData.Jumhon, bdcData.Jetlica],
                         backgroundColor: ['#1e3c72', '#2a5298', '#3b7dd9'],
                         borderRadius: 8,
@@ -1410,7 +1410,7 @@ Jetlica,14.1,52,9.1</pre>
                 Jetlica: filtered.filter(e => e.team === 'Jetlica').reduce((sum, e) => sum + e.coaching, 0)
             };
             
-            const totalBDC = Object.values(bdcData).reduce((a, b) => a + b, 0);
+            const totalDC = Object.values(bdcData).reduce((a, b) => a + b, 0);
             const totalCoaching = Object.values(coachingData).reduce((a, b) => a + b, 0);
             
             const report = `PERFORMANCE REPORT
@@ -1418,15 +1418,15 @@ Generated: ${new Date().toLocaleString()}
 
 SUMMARY
 -------
-Total BDCs: ${totalBDC}
+Total DCs: ${totalDC}
 Total Coaching Sessions: ${totalCoaching}
 Total Entries: ${filtered.length}
 
 TEAM BREAKDOWN
 --------------
-RitchCent: ${bdcData.RitchCent} BDCs, ${coachingData.RitchCent} Coaching Sessions
-Jumhon: ${bdcData.Jumhon} BDCs, ${coachingData.Jumhon} Coaching Sessions
-Jetlica: ${bdcData.Jetlica} BDCs, ${coachingData.Jetlica} Coaching Sessions
+RitchCent: ${bdcData.RitchCent} DCs, ${coachingData.RitchCent} Coaching Sessions
+Jumhon: ${bdcData.Jumhon} DCs, ${coachingData.Jumhon} Coaching Sessions
+Jetlica: ${bdcData.Jetlica} DCs, ${coachingData.Jetlica} Coaching Sessions
 `;
             
             const blob = new Blob([report], { type: 'text/plain' });
@@ -1591,7 +1591,7 @@ Jetlica: ${bdcData.Jetlica} BDCs, ${coachingData.Jetlica} Coaching Sessions
             showMessage('metricsMsg', '✓ Goal saved successfully!', 'success');
         }
         
-        function updateGoalDisplay(selectedMonth, totalBDC) {
+        function updateGoalDisplay(selectedMonth, totalDC) {
             const monthNames = {
                 '2026-04': 'April 2026',
                 '2026-05': 'May 2026',
@@ -1609,7 +1609,7 @@ Jetlica: ${bdcData.Jetlica} BDCs, ${coachingData.Jetlica} Coaching Sessions
             const goals = JSON.parse(localStorage.getItem(GOALS_KEY) || '{}');
             const goal = goals[selectedMonth];
             
-            document.getElementById('actualBDCs').textContent = totalBDC;
+            document.getElementById('actualDCs').textContent = totalDC;
             
             if (!goal) {
                 document.getElementById('goalAmount').textContent = '-';
@@ -1621,15 +1621,15 @@ Jetlica: ${bdcData.Jetlica} BDCs, ${coachingData.Jetlica} Coaching Sessions
             
             document.getElementById('goalAmount').textContent = goal;
             
-            const percentage = Math.min(Math.round((totalBDC / goal) * 100), 100);
+            const percentage = Math.min(Math.round((totalDC / goal) * 100), 100);
             document.getElementById('goalPercentage').textContent = percentage + '%';
             document.getElementById('progressBar').style.width = percentage + '%';
             
-            const remaining = Math.max(0, goal - totalBDC);
+            const remaining = Math.max(0, goal - totalDC);
             if (percentage >= 100) {
-                document.getElementById('goalStatus').textContent = `🎉 Goal achieved! ${totalBDC}/${goal} BDCs`;
+                document.getElementById('goalStatus').textContent = `🎉 Goal achieved! ${totalDC}/${goal} DCs`;
             } else {
-                document.getElementById('goalStatus').textContent = `${remaining} BDCs remaining to reach goal`;
+                document.getElementById('goalStatus').textContent = `${remaining} DCs remaining to reach goal`;
             }
         }
         
