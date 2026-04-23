@@ -531,6 +531,73 @@
                 grid-template-columns: 1fr;
             }
         }
+        
+        .daily-entry-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border-left: 4px solid #2a5298;
+        }
+        
+        .daily-entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e8eaed;
+        }
+        
+        .daily-entry-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e3c72;
+        }
+        
+        .daily-entry-team {
+            display: inline-block;
+            background: #2a5298;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .daily-entry-section {
+            margin-bottom: 1rem;
+        }
+        
+        .daily-entry-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e3c72;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.4rem;
+        }
+        
+        .daily-entry-value {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.5;
+            padding: 0.8rem;
+            background: #f9fafb;
+            border-radius: 6px;
+        }
+        
+        .daily-bdc-highlight {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2a5298;
+            display: inline-block;
+            background: #e8ecf2;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -543,6 +610,7 @@
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('dashboard')">🏠 Home / Dashboard</button>
             <button class="tab-btn" onclick="switchTab('form')">📝 Daily EOD Entry</button>
+            <button class="tab-btn" onclick="switchTab('daily')">📅 Daily EOD Summary</button>
             <button class="tab-btn" onclick="switchTab('metrics')">📊 Team Metrics</button>
             <button class="tab-btn" onclick="switchTab('reports')">📉 Reports</button>
             <button class="tab-btn" onclick="switchTab('entries')">📋 All Entries</button>
@@ -662,17 +730,17 @@
                 </div>
             </div>
             
-            <h2>Team Performance (This Month + Key Metrics)</h2>
+            <h2 id="teamPerformanceHeader">Team Performance (This Month + Key Metrics)</h2>
             <div class="teams-section">
                 <div class="team-card">
                     <div class="team-header">
                         <div class="team-name">RitchCent</div>
                         <div class="team-stat">
-                            <span class="team-stat-label">Month BDCs:</span>
+                            <span class="team-stat-label" id="bdcLabelRitchCent">Month BDCs:</span>
                             <span class="team-stat-value" id="bdcRitchCent">0</span>
                         </div>
                         <div class="team-stat">
-                            <span class="team-stat-label">Month Coaching:</span>
+                            <span class="team-stat-label" id="coachingLabelRitchCent">Month Coaching:</span>
                             <span class="team-stat-value" id="coachingRitchCent">0</span>
                         </div>
                     </div>
@@ -698,11 +766,11 @@
                     <div class="team-header">
                         <div class="team-name">Jumhon</div>
                         <div class="team-stat">
-                            <span class="team-stat-label">Month BDCs:</span>
+                            <span class="team-stat-label" id="bdcLabelJumhon">Month BDCs:</span>
                             <span class="team-stat-value" id="bdcJumhon">0</span>
                         </div>
                         <div class="team-stat">
-                            <span class="team-stat-label">Month Coaching:</span>
+                            <span class="team-stat-label" id="coachingLabelJumhon">Month Coaching:</span>
                             <span class="team-stat-value" id="coachingJumhon">0</span>
                         </div>
                     </div>
@@ -728,11 +796,11 @@
                     <div class="team-header">
                         <div class="team-name">Jetlica</div>
                         <div class="team-stat">
-                            <span class="team-stat-label">Month BDCs:</span>
+                            <span class="team-stat-label" id="bdcLabelJetlica">Month BDCs:</span>
                             <span class="team-stat-value" id="bdcJetlica">0</span>
                         </div>
                         <div class="team-stat">
-                            <span class="team-stat-label">Month Coaching:</span>
+                            <span class="team-stat-label" id="coachingLabelJetlica">Month Coaching:</span>
                             <span class="team-stat-value" id="coachingJetlica">0</span>
                         </div>
                     </div>
@@ -756,7 +824,21 @@
             </div>
         </div>
         
-        <!-- TEAM METRICS TAB -->
+        <!-- DAILY EOD SUMMARY TAB -->
+        <div id="daily" class="tab-content">
+            <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 2rem;">
+                <label style="font-size: 13px; font-weight: 600; color: #1e3c72; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 0.5rem;">Select Date</label>
+                <input type="date" id="dailyDate" class="form-input" style="width: 250px; margin-bottom: 1rem;" onchange="updateDailyView()">
+                <div style="color: #6b7280; font-size: 13px;">
+                    📅 Showing entries for <strong id="dailyDateDisplay">Today</strong>
+                </div>
+            </div>
+            
+            <div id="dailyContent">
+                <div class="no-data">Select a date to view EOD entries</div>
+            </div>
+        </div>
+        
         <div id="metrics" class="tab-content">
             <div class="form-container" style="max-width: 100%;">
                 <h2>Team Metrics</h2>
@@ -889,6 +971,11 @@ Jetlica,14.1,52,9.1</pre>
         
         window.addEventListener('load', () => {
             document.getElementById('dashboardMonth').value = '2026-04';
+            
+            // Set daily date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dailyDate').value = today;
+            
             loadData();
             displayMetrics();
             setInterval(loadData, 5000); // Refresh every 5 seconds
@@ -928,6 +1015,85 @@ Jetlica,14.1,52,9.1</pre>
             if (tabName === 'dashboard') updateDashboard();
             else if (tabName === 'entries') populateEntries();
             else if (tabName === 'reports') generateReports();
+            else if (tabName === 'daily') updateDailyView();
+        }
+        
+        function updateDailyView() {
+            const selectedDate = document.getElementById('dailyDate').value;
+            
+            if (!selectedDate) {
+                document.getElementById('dailyContent').innerHTML = '<div class="no-data">Select a date to view EOD entries</div>';
+                document.getElementById('dailyDateDisplay').textContent = 'Today';
+                return;
+            }
+            
+            const dateObj = new Date(selectedDate);
+            const dateDisplay = dateObj.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('dailyDateDisplay').textContent = dateDisplay;
+            
+            // Filter data for selected date
+            const dailyData = allData.filter(e => e.date === selectedDate);
+            
+            if (dailyData.length === 0) {
+                document.getElementById('dailyContent').innerHTML = `<div class="no-data">No EOD entries for ${dateDisplay}</div>`;
+                return;
+            }
+            
+            // Group by team for better organization
+            const byTeam = {};
+            dailyData.forEach(entry => {
+                if (!byTeam[entry.team]) byTeam[entry.team] = [];
+                byTeam[entry.team].push(entry);
+            });
+            
+            let html = '';
+            
+            // Display by team
+            ['RitchCent', 'Jumhon', 'Jetlica'].forEach(team => {
+                if (!byTeam[team]) return;
+                
+                byTeam[team].forEach(entry => {
+                    html += `
+                        <div class="daily-entry-card">
+                            <div class="daily-entry-header">
+                                <div>
+                                    <div class="daily-entry-title">${entry.leader}</div>
+                                    <span class="daily-entry-team">${entry.team}</span>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-bottom: 1.5rem;">
+                                <div class="daily-bdc-highlight">
+                                    ${entry.bdc} BDCs
+                                </div>
+                                <div style="font-size: 12px; color: #6b7280;">Booked Discovery Calls</div>
+                            </div>
+                            
+                            <div class="daily-entry-section">
+                                <div class="daily-entry-label">🌟 Highlights</div>
+                                <div class="daily-entry-value">${entry.highlights || '<span style="color: #9ca3af; font-style: italic;">No highlights recorded</span>'}</div>
+                            </div>
+                            
+                            <div class="daily-entry-section">
+                                <div class="daily-entry-label">⚠️ Lowlights</div>
+                                <div class="daily-entry-value">${entry.lowlights || '<span style="color: #9ca3af; font-style: italic;">No lowlights recorded</span>'}</div>
+                            </div>
+                            
+                            <div class="daily-entry-section">
+                                <div class="daily-entry-label">📅 Plan for Tomorrow</div>
+                                <div class="daily-entry-value">${entry.planTomorrow || '<span style="color: #9ca3af; font-style: italic;">No plan recorded</span>'}</div>
+                            </div>
+                            
+                            <div class="daily-entry-section" style="margin-bottom: 0;">
+                                <div class="daily-entry-label">🎯 Coaching Sessions</div>
+                                <div class="daily-entry-value" style="background: #d4edda; color: #155724; font-weight: 600;">${entry.coaching} sessions completed</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+            
+            document.getElementById('dailyContent').innerHTML = html;
         }
         
         function updateDashboard() {
@@ -947,12 +1113,36 @@ Jetlica,14.1,52,9.1</pre>
             };
             document.getElementById('monthDisplay').textContent = monthNames[selectedMonth];
             
-            // Show week display
+            // Show week display with date range
+            let weekDisplay = '';
+            let periodText = 'This Month';
+            
             if (selectedWeek) {
-                document.getElementById('weekDisplay').textContent = `(${selectedWeek.charAt(0).toUpperCase() + selectedWeek.slice(1)})`;
-            } else {
-                document.getElementById('weekDisplay').textContent = '';
+                periodText = 'This Week';
+                let startDay, endDay;
+                if (selectedWeek === 'week1') { startDay = 1; endDay = 7; }
+                else if (selectedWeek === 'week2') { startDay = 8; endDay = 14; }
+                else if (selectedWeek === 'week3') { startDay = 15; endDay = 21; }
+                else if (selectedWeek === 'week4') { startDay = 22; endDay = 28; }
+                else if (selectedWeek === 'week5') { startDay = 29; endDay = 30; }
+                
+                const monthNum = selectedMonth.split('-')[1];
+                const monthAbbr = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][parseInt(monthNum)];
+                weekDisplay = ` - Week ${selectedWeek === 'week1' ? '1' : selectedWeek === 'week2' ? '2' : selectedWeek === 'week3' ? '3' : selectedWeek === 'week4' ? '4' : '5'} (${monthAbbr} ${startDay}-${endDay})`;
             }
+            
+            document.getElementById('weekDisplay').textContent = weekDisplay;
+            
+            // Update team performance header
+            const performanceHeader = selectedWeek ? `Team Performance (This Week + Key Metrics)` : `Team Performance (This Month + Key Metrics)`;
+            document.getElementById('teamPerformanceHeader').textContent = performanceHeader;
+            
+            // Update team card labels
+            const periodLabel = selectedWeek ? 'Week' : 'Month';
+            ['RitchCent', 'Jumhon', 'Jetlica'].forEach(team => {
+                document.getElementById(`bdcLabel${team}`).textContent = `${periodLabel} BDCs:`;
+                document.getElementById(`coachingLabel${team}`).textContent = `${periodLabel} Coaching:`;
+            });
             
             // Filter data by month
             let filtered = allData.filter(e => e.date && e.date.startsWith(selectedMonth));
