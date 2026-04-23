@@ -577,8 +577,19 @@
                         <option value="2026-12">December 2026</option>
                     </select>
                 </div>
+                <div>
+                    <label style="font-size: 13px; font-weight: 600; color: #1e3c72; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 0.5rem;">Select Week (Optional)</label>
+                    <select id="dashboardWeek" class="form-select" onchange="updateDashboard()" style="width: 200px;">
+                        <option value="">All Weeks</option>
+                        <option value="week1">Week 1</option>
+                        <option value="week2">Week 2</option>
+                        <option value="week3">Week 3</option>
+                        <option value="week4">Week 4</option>
+                        <option value="week5">Week 5</option>
+                    </select>
+                </div>
                 <div style="color: #6b7280; font-size: 13px;">
-                    📅 Showing <strong id="monthDisplay">April 2026</strong> Month-to-Date
+                    📅 Showing <strong id="monthDisplay">April 2026</strong> <span id="weekDisplay"></span> Month-to-Date
                 </div>
             </div>
             
@@ -921,6 +932,7 @@ Jetlica,14.1,52,9.1</pre>
         
         function updateDashboard() {
             const selectedMonth = document.getElementById('dashboardMonth').value || '2026-04';
+            const selectedWeek = document.getElementById('dashboardWeek').value || '';
             
             const monthNames = {
                 '2026-04': 'April 2026',
@@ -935,7 +947,30 @@ Jetlica,14.1,52,9.1</pre>
             };
             document.getElementById('monthDisplay').textContent = monthNames[selectedMonth];
             
-            const filtered = allData.filter(e => e.date && e.date.startsWith(selectedMonth));
+            // Show week display
+            if (selectedWeek) {
+                document.getElementById('weekDisplay').textContent = `(${selectedWeek.charAt(0).toUpperCase() + selectedWeek.slice(1)})`;
+            } else {
+                document.getElementById('weekDisplay').textContent = '';
+            }
+            
+            // Filter data by month
+            let filtered = allData.filter(e => e.date && e.date.startsWith(selectedMonth));
+            
+            // Filter by week if selected
+            if (selectedWeek) {
+                filtered = filtered.filter(e => {
+                    const date = new Date(e.date);
+                    const dayOfMonth = date.getDate();
+                    
+                    if (selectedWeek === 'week1') return dayOfMonth >= 1 && dayOfMonth <= 7;
+                    if (selectedWeek === 'week2') return dayOfMonth >= 8 && dayOfMonth <= 14;
+                    if (selectedWeek === 'week3') return dayOfMonth >= 15 && dayOfMonth <= 21;
+                    if (selectedWeek === 'week4') return dayOfMonth >= 22 && dayOfMonth <= 28;
+                    if (selectedWeek === 'week5') return dayOfMonth >= 29;
+                    return true;
+                });
+            }
             
             const totalBDC = filtered.reduce((sum, e) => sum + e.bdc, 0);
             const totalCoaching = filtered.reduce((sum, e) => sum + e.coaching, 0);
@@ -999,7 +1034,24 @@ Jetlica,14.1,52,9.1</pre>
         
         function generateReports() {
             const selectedMonth = document.getElementById('dashboardMonth').value || '2026-04';
-            const filtered = allData.filter(e => e.date && e.date.startsWith(selectedMonth));
+            const selectedWeek = document.getElementById('dashboardWeek').value || '';
+            
+            let filtered = allData.filter(e => e.date && e.date.startsWith(selectedMonth));
+            
+            // Filter by week if selected
+            if (selectedWeek) {
+                filtered = filtered.filter(e => {
+                    const date = new Date(e.date);
+                    const dayOfMonth = date.getDate();
+                    
+                    if (selectedWeek === 'week1') return dayOfMonth >= 1 && dayOfMonth <= 7;
+                    if (selectedWeek === 'week2') return dayOfMonth >= 8 && dayOfMonth <= 14;
+                    if (selectedWeek === 'week3') return dayOfMonth >= 15 && dayOfMonth <= 21;
+                    if (selectedWeek === 'week4') return dayOfMonth >= 22 && dayOfMonth <= 28;
+                    if (selectedWeek === 'week5') return dayOfMonth >= 29;
+                    return true;
+                });
+            }
             
             const bdcData = {
                 RitchCent: filtered.filter(e => e.team === 'RitchCent').reduce((sum, e) => sum + e.bdc, 0),
