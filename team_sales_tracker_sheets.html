@@ -621,7 +621,7 @@
             <div class="form-entry">
                 <h3>📝 Daily EOD Entry Form</h3>
                 <p style="color: #6b7280; margin-bottom: 1.5rem;">Click below to fill out your daily entry. The form opens in a new window.</p>
-                <a href="https://forms.google.com/forms/d/1Kr8mfHZr_q5Z2EbFzecQJR4PIfHcaxaIQS5DSWn5bnA/viewform" target="_blank" class="form-link">
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSdzvGe51HDpTugYcYa_mi82FqfBTAiRtszFlILMkhv5lIIbMw/viewform?usp=header" target="_blank" class="form-link">
                     ➡️ Open Daily EOD Entry Form
                 </a>
                 <p style="color: #9ca3af; font-size: 13px; margin-top: 1rem;">Your entry will appear on the Dashboard and All Entries tab in real-time.</p>
@@ -730,7 +730,7 @@
                 </div>
             </div>
             
-            <h2 id="teamPerformanceHeader">Team Performance (This Month + Key Metrics)</h2>
+            <h2 id="teamPerformanceHeader">Team Performance</h2>
             <div class="teams-section">
                 <div class="team-card">
                     <div class="team-header">
@@ -745,21 +745,6 @@
                         </div>
                     </div>
                     <div class="leaders-list" id="leadersRitchCent"></div>
-                    <div style="padding: 1rem; background: #f9fafb; border-top: 1px solid #e8eaed;">
-                        <div style="font-size: 12px; font-weight: 600; color: #1e3c72; margin-bottom: 0.8rem;">📊 Key Metrics</div>
-                        <div class="team-stat">
-                            <span class="team-stat-label">Avg Leads/Day:</span>
-                            <span class="team-stat-value" id="leadsRitchCent">-</span>
-                        </div>
-                        <div class="team-stat">
-                            <span class="team-stat-label">Dials/Day:</span>
-                            <span class="team-stat-value" id="dialsRitchCent">-</span>
-                        </div>
-                        <div class="team-stat">
-                            <span class="team-stat-label">Conversion Rate:</span>
-                            <span class="team-stat-value" id="conversionRitchCent">-</span>
-                        </div>
-                    </div>
                 </div>
                 
                 <div class="team-card">
@@ -775,21 +760,6 @@
                         </div>
                     </div>
                     <div class="leaders-list" id="leadersJumhon"></div>
-                    <div style="padding: 1rem; background: #f9fafb; border-top: 1px solid #e8eaed;">
-                        <div style="font-size: 12px; font-weight: 600; color: #1e3c72; margin-bottom: 0.8rem;">📊 Key Metrics</div>
-                        <div class="team-stat">
-                            <span class="team-stat-label">Avg Leads/Day:</span>
-                            <span class="team-stat-value" id="leadsJumhon">-</span>
-                        </div>
-                        <div class="team-stat">
-                            <span class="team-stat-label">Dials/Day:</span>
-                            <span class="team-stat-value" id="dialsJumhon">-</span>
-                        </div>
-                        <div class="team-stat">
-                            <span class="team-stat-label">Conversion Rate:</span>
-                            <span class="team-stat-value" id="conversionJumhon">-</span>
-                        </div>
-                    </div>
                 </div>
                 
                 <div class="team-card">
@@ -805,21 +775,6 @@
                         </div>
                     </div>
                     <div class="leaders-list" id="leadersJetlica"></div>
-                    <div style="padding: 1rem; background: #f9fafb; border-top: 1px solid #e8eaed;">
-                        <div style="font-size: 12px; font-weight: 600; color: #1e3c72; margin-bottom: 0.8rem;">📊 Key Metrics</div>
-                        <div class="team-stat">
-                            <span class="team-stat-label">Avg Leads/Day:</span>
-                            <span class="team-stat-value" id="leadsJetlica">-</span>
-                        </div>
-                        <div class="team-stat">
-                            <span class="team-stat-label">Dials/Day:</span>
-                            <span class="team-stat-value" id="dialsJetlica">-</span>
-                        </div>
-                        <div class="team-stat">
-                            <span class="team-stat-label">Conversion Rate:</span>
-                            <span class="team-stat-value" id="conversionJetlica">-</span>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -1147,7 +1102,7 @@ Jetlica,14.1,52,9.1</pre>
             document.getElementById('weekDisplay').textContent = weekDisplay;
             
             // Update team performance header
-            const performanceHeader = selectedWeek ? `Team Performance (This Week + Key Metrics)` : `Team Performance (This Month + Key Metrics)`;
+            const performanceHeader = selectedWeek ? `Team Performance` : `Team Performance`;
             document.getElementById('teamPerformanceHeader').textContent = performanceHeader;
             
             // Update team card labels
