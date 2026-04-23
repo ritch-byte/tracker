@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Sales Tracker - Live Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: #f5f7fa; 
+            color: #333;
+        }
+        
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.2);
+        }
+        
+        .header h1 { font-size: 28px; margin-bottom: 0.5rem; font-weight: 700; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: #f0f2f5;
+            color: #333;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+        
+        .tab-btn:hover { background: #e0e4e8; }
+        .tab-btn.active:hover { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .form-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            max-width: 600px;
+        }
+        
+        .form-group { margin-bottom: 1.5rem; }
+        
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1e3c72;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d0d4d8;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            width: 100%;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+        }
+        
+        .msg {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            font-size: 14px;
+            border-left: 4px solid;
+        }
+        
+        .success-msg {
+            background: #d4edda;
+            color: #155724;
+            border-color: #28a745;
+        }
+        
+        .error-msg {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        
+        .metric-label {
+            font-size: 11px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1e3c72;
+        }
+        
+        .goal-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+        
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .goal-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e3c72;
+        }
+        
+        .btn-edit-goal {
+            background: #2a5298;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-edit-goal:hover {
+            background: #1e3c72;
+            transform: translateY(-2px);
+        }
+        
+        .goal-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .goal-stat {
+            text-align: center;
+        }
+        
+        .goal-stat-label {
+            font-size: 11px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .goal-stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e3c72;
+        }
+        
+        .progress-bar-container {
+            background: #e8eaed;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .goal-percentage {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 600;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+            position: relative;
+            height: 400px;
+        }
+        
+        .chart-container h3 {
+            color: #1e3c72;
+            margin-bottom: 1rem;
+            font-size: 16px;
+        }
+        
+        .chart-wrapper {
+            position: relative;
+            height: 350px;
+        }
+        
+        .teams-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .team-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        
+        .team-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f0f4f9 0%, #e8ecf2 100%);
+            border-bottom: 2px solid #2a5298;
+        }
+        
+        .team-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e3c72;
+            margin-bottom: 0.8rem;
+        }
+        
+        .team-stat {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.5rem 0;
+            font-size: 13px;
+        }
+        
+        .team-stat-label { color: #6b7280; }
+        .team-stat-value { color: #2a5298; font-weight: 700; }
+        
+        .leaders-list { padding: 1rem; }
+        
+        .leader-item {
+            padding: 1rem;
+            border-bottom: 1px solid #e8eaed;
+            font-size: 13px;
+        }
+        
+        .leader-item:last-child { border-bottom: none; }
+        .leader-name { font-weight: 600; color: #1e3c72; margin-bottom: 0.3rem; }
+        .leader-stat { color: #6b7280; font-size: 12px; }
+        
+        .ranking-table {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+        
+        .ranking-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .ranking-table thead {
+            background: #f0f4f9;
+            border-bottom: 2px solid #2a5298;
+        }
+        
+        .ranking-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            color: #1e3c72;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .ranking-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e8eaed;
+            font-size: 13px;
+        }
+        
+        .ranking-table tbody tr:hover { background: #f9fafb; }
+        
+        .rank-badge {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #1e3c72;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: 700;
+            margin-right: 0.5rem;
+        }
+        
+        .entries-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        
+        .entries-table thead {
+            background: #f0f4f9;
+            border-bottom: 2px solid #2a5298;
+        }
+        
+        .entries-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            color: #1e3c72;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .entries-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e8eaed;
+            font-size: 13px;
+        }
+        
+        .entries-table tbody tr:hover { background: #f9fafb; }
+        
+        .btn-delete {
+            background: #fee;
+            color: #c33;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .btn-delete:hover { background: #fdd; }
+        
+        .no-data {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        h2 { color: #1e3c72; margin-bottom: 1.5rem; margin-top: 0; }
+        
+        .actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn-download, .btn-clear {
+            flex: 1;
+            min-width: 150px;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-download {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-download:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+        
+        .btn-clear {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-clear:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .upload-area {
+            border: 2px dashed #2a5298;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f9fafb;
+        }
+
+        .upload-area:hover {
+            background: #f0f4f9;
+            border-color: #1e3c72;
+        }
+
+        .file-info {
+            background: #f3f4f6;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        #csvFile, #metricsFile { display: none; }
+        
+        .form-entry {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .form-entry h3 {
+            color: #1e3c72;
+            margin-bottom: 1rem;
+        }
+        
+        .form-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .form-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Team Sales Tracker</h1>
+            <p>RitchCent • Jumhon • Jetlica - Live Dashboard & Analytics</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('dashboard')">🏠 Home / Dashboard</button>
+            <button class="tab-btn" onclick="switchTab('form')">📝 Daily EOD Entry</button>
+            <button class="tab-btn" onclick="switchTab('metrics')">📊 Team Metrics</button>
+            <button class="tab-btn" onclick="switchTab('reports')">📉 Reports</button>
+            <button class="tab-btn" onclick="switchTab('entries')">📋 All Entries</button>
+        </div>
+        
+        <!-- DAILY EOD ENTRY TAB -->
+        <div id="form" class="tab-content">
+            <div class="form-entry">
+                <h3>📝 Daily EOD Entry Form</h3>
+                <p style="color: #6b7280; margin-bottom: 1.5rem;">Click below to fill out your daily entry. The form opens in a new window.</p>
+                <a href="https://forms.google.com/forms/d/1Kr8mfHZr_q5Z2EbFzecQJR4PIfHcaxaIQS5DSWn5bnA/viewform" target="_blank" class="form-link">
+                    ➡️ Open Daily EOD Entry Form
+                </a>
+                <p style="color: #9ca3af; font-size: 13px; margin-top: 1rem;">Your entry will appear on the Dashboard and All Entries tab in real-time.</p>
+            </div>
+        </div>
+        
+        <!-- DASHBOARD TAB -->
+        <div id="dashboard" class="tab-content active">
+            <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 2rem; display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;">
+                <div>
+                    <label style="font-size: 13px; font-weight: 600; color: #1e3c72; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 0.5rem;">Select Month</label>
+                    <select id="dashboardMonth" class="form-select" onchange="updateDashboard()" style="width: 200px;">
+                        <option value="2026-04">April 2026</option>
+                        <option value="2026-05">May 2026</option>
+                        <option value="2026-06">June 2026</option>
+                        <option value="2026-07">July 2026</option>
+                        <option value="2026-08">August 2026</option>
+                        <option value="2026-09">September 2026</option>
+                        <option value="2026-10">October 2026</option>
+                        <option value="2026-11">November 2026</option>
+                        <option value="2026-12">December 2026</option>
+                    </select>
+                </div>
+                <div style="color: #6b7280; font-size: 13px;">
+                    📅 Showing <strong id="monthDisplay">April 2026</strong> Month-to-Date
+                </div>
+            </div>
+            
+            <!-- MONTHLY GOAL SECTION -->
+            <div class="goal-section">
+                <div class="goal-header">
+                    <div class="goal-title">🎯 Monthly Goal for <span id="goalMonthDisplay">April 2026</span></div>
+                    <button class="btn-edit-goal" onclick="openGoalModal()">Edit Goal</button>
+                </div>
+                
+                <div class="goal-stats">
+                    <div class="goal-stat">
+                        <div class="goal-stat-label">Target BDCs</div>
+                        <div class="goal-stat-value" id="goalAmount">-</div>
+                    </div>
+                    <div class="goal-stat">
+                        <div class="goal-stat-label">Actual BDCs</div>
+                        <div class="goal-stat-value" id="actualBDCs">0</div>
+                    </div>
+                    <div class="goal-stat">
+                        <div class="goal-stat-label">Progress</div>
+                        <div class="goal-stat-value" id="goalPercentage">-</div>
+                    </div>
+                </div>
+                
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
+                </div>
+                <div class="goal-percentage" id="goalStatus">Set a goal to track progress</div>
+            </div>
+            
+            <!-- GOAL MODAL -->
+            <div id="goalModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4);">
+                <div style="background-color: white; margin: 10% auto; padding: 2rem; border-radius: 8px; width: 90%; max-width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                    <span style="float: right; font-size: 24px; font-weight: bold; color: #9ca3af; cursor: pointer; transition: all 0.2s;" onclick="closeGoalModal()">&times;</span>
+                    <div style="font-size: 18px; font-weight: 600; color: #1e3c72; margin-bottom: 1.5rem;">Set Monthly BDC Goal</div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="font-size: 13px; font-weight: 600; color: #1e3c72; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 0.5rem;">Month: <span id="modalMonthDisplay">April 2026</span></label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Target BDCs for this month</label>
+                        <input type="number" id="goalInput" class="form-input" placeholder="Enter target BDCs (e.g., 100)" min="0">
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                        <button onclick="saveGoal()" style="flex: 1; padding: 0.75rem; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Save Goal</button>
+                        <button onclick="closeGoalModal()" style="flex: 1; padding: 0.75rem; background: #f0f2f5; color: #333; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Total BDCs</div>
+                    <div class="metric-value" id="totalBDC">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Total Coaching</div>
+                    <div class="metric-value" id="totalCoaching">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Total Entries</div>
+                    <div class="metric-value" id="totalEntries">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Active Teams</div>
+                    <div class="metric-value" id="activeTeams">0</div>
+                </div>
+            </div>
+            
+            <h2>Team Performance (This Month + Key Metrics)</h2>
+            <div class="teams-section">
+                <div class="team-card">
+                    <div class="team-header">
+                        <div class="team-name">RitchCent</div>
+                        <div class="team-stat">
+                            <span class="team-stat-label">Month BDCs:</span>
+                            <span class="team-stat-value" id="bdcRitchCent">0</span>
+                        </div>
+                        <div class="team-stat">
+                            <span class="team-stat-label">Month Coaching:</span>
+                            <span class="team-stat-value" id="coachingRitchCent">0</span>
+                        </div>
+                    </div>
+                    <div class="leaders-list" id="leadersRitchCent"></div>
+                    <div style="padding: 1rem; background: #f9fafb; border-top: 1px solid #e8eaed;">
+                        <div style="font-size: 12px; font-weight: 600; color: #1e3c72; margin-bottom: 0.8rem;">📊 Key Metrics</div>
+                        <div class="team-stat">
+                            <span class="team-stat-label">Avg Leads/Day:</span>
+                            <span class="team-stat-value" id="leadsRitchCent">-</span>
+                        </div>
+                        <div class="team-stat">
+                            <span class="team-stat-label">Dials/Day:</span>
+                            <span class="team-stat-value" id="dialsRitchCent">-</span>
+                        </div>
+                        <div class="team-stat">
+                            <span class="team-stat-label">Conversion Rate:</span>
+                            <span class="team-stat-value" id="conversionRitchCent">-</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="team-card">
+                    <div class="team-header">
+                        <div class="team-name">Jumhon</div>
+                        <div class="team-stat">
+                            <span class="team-stat-label">Month BDCs:</span>
+                            <span class="team-stat-value" id="bdcJumhon">0</span>
+                        </div>
+                        <div class="team-stat">
+                            <span class="team-stat-label">Month Coaching:</span>
+                            <span class="team-stat-value" id="coachingJumhon">0</span>
+                        </div>
+                    </div>
+                    <div class="leaders-list" id="leadersJumhon"></div>
+                    <div style="padding: 1rem; background: #f9fafb; border-top: 1px solid #e8eaed;">
+                        <div style="font-size: 12px; font-weight: 600; color: #1e3c72; margin-bottom: 0.8rem;">📊 Key Metrics</div>
+                        <div class="team-stat">
+                            <span class="team-stat-label">Avg Leads/Day:</span>
+                            <span class="team-stat-value" id="leadsJumhon">-</span>
+                        </div>
+                        <div class="team-stat">
+                            <span class="team-stat-label">Dials/Day:</span>
+                            <span class="team-stat-value" id="dialsJumhon">-</span>
+                        </div>
+                        <div class="team-stat">
+                            <span class="team-stat-label">Conversion Rate:</span>
+                            <span class="team-stat-value" id="conversionJumhon">-</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="team-card">
+                    <div class="team-header">
+                        <div class="team-name">Jetlica</div>
+                        <div class="team-stat">
+                            <span class="team-stat-label">Month BDCs:</span>
+                            <span class="team-stat-value" id="bdcJetlica">0</span>
+                        </div>
+                        <div class="team-stat">
+                            <span class="team-stat-label">Month Coaching:</span>
+                            <span class="team-stat-value" id="coachingJetlica">0</span>
+                        </div>
+                    </div>
+                    <div class="leaders-list" id="leadersJetlica"></div>
+                    <div style="padding: 1rem; background: #f9fafb; border-top: 1px solid #e8eaed;">
+                        <div style="font-size: 12px; font-weight: 600; color: #1e3c72; margin-bottom: 0.8rem;">📊 Key Metrics</div>
+                        <div class="team-stat">
+                            <span class="team-stat-label">Avg Leads/Day:</span>
+                            <span class="team-stat-value" id="leadsJetlica">-</span>
+                        </div>
+                        <div class="team-stat">
+                            <span class="team-stat-label">Dials/Day:</span>
+                            <span class="team-stat-value" id="dialsJetlica">-</span>
+                        </div>
+                        <div class="team-stat">
+                            <span class="team-stat-label">Conversion Rate:</span>
+                            <span class="team-stat-value" id="conversionJetlica">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TEAM METRICS TAB -->
+        <div id="metrics" class="tab-content">
+            <div class="form-container" style="max-width: 100%;">
+                <h2>Team Metrics</h2>
+                <p style="color: #6b7280; margin-bottom: 1.5rem; font-size: 14px;">Upload your team's key metrics (Leads Per Day, Dials Per Day, Conversion Rate)</p>
+                
+                <div id="metricsMsg"></div>
+                
+                <div class="upload-area" onclick="document.getElementById('metricsFile').click()" ondrop="handleMetricsDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                    <div style="font-size: 36px; margin-bottom: 1rem;">📊</div>
+                    <div style="font-size: 14px; color: #6b7280; margin-bottom: 0.5rem;">Click to select CSV file or drag & drop</div>
+                    <div style="font-size: 12px; color: #9ca3af;">Team metrics CSV format</div>
+                </div>
+                
+                <input type="file" id="metricsFile" accept=".csv" onchange="handleMetricsFileSelect(event)">
+                <div id="metricsFileInfo"></div>
+                
+                <button class="btn btn-primary" onclick="processMetricsFile()" style="margin-top: 1rem;">Upload Metrics</button>
+                
+                <div style="margin-top: 2rem; padding: 1.5rem; background: #f3f4f6; border-radius: 8px;">
+                    <h3 style="color: #1e3c72; margin-bottom: 1rem; font-size: 14px;">📋 CSV Format Required:</h3>
+                    <pre style="font-size: 12px; color: #6b7280; overflow-x: auto;">Team,Average Leads Per Day,Dials Per Day,Conversion Rate
+RitchCent,12.5,45,8.5
+Jumhon,10.2,38,7.2
+Jetlica,14.1,52,9.1</pre>
+                </div>
+            </div>
+            
+            <div style="margin-top: 2rem;">
+                <h2>Current Team Metrics</h2>
+                <div class="ranking-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Team</th>
+                                <th>Avg Leads/Day</th>
+                                <th>Dials/Day</th>
+                                <th>Conversion Rate (%)</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="metricsBody">
+                            <tr><td colspan="5" style="text-align: center; color: #9ca3af;">No metrics uploaded yet</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- REPORTS TAB -->
+        <div id="reports" class="tab-content">
+            <h2>Performance Reports & Analytics</h2>
+            
+            <div class="chart-container">
+                <h3>📊 BDCs by Team</h3>
+                <div class="chart-wrapper">
+                    <canvas id="bdcChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>🎯 Coaching Sessions by Team</h3>
+                <div class="chart-wrapper">
+                    <canvas id="coachingChart"></canvas>
+                </div>
+            </div>
+            
+            <h2>🏆 Team Leader Rankings</h2>
+            <div class="ranking-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Team Leader</th>
+                            <th>Team</th>
+                            <th>Coaching Sessions</th>
+                            <th>BDC Contribution</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rankingBody"></tbody>
+                </table>
+            </div>
+            
+            <div class="actions">
+                <button class="btn-download" onclick="downloadReport()">📄 Download Report</button>
+            </div>
+        </div>
+        
+        <!-- ENTRIES TAB -->
+        <div id="entries" class="tab-content">
+            <h2>All Entries</h2>
+            
+            <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 200px;">
+                    <span style="color: #6b7280; font-size: 13px;">🔒 Delete access is admin-only</span>
+                </div>
+                <button class="btn-download" id="adminUnlockBtn" onclick="unlockAdminMode()" style="background: #f59e0b; margin: 0;">🔓 Unlock Deletes</button>
+                <button class="btn-download" id="adminLockBtn" onclick="lockAdminMode()" style="background: #10b981; margin: 0; display: none;">🔒 Lock Deletes</button>
+            </div>
+            
+            <table class="entries-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Team</th>
+                        <th>Leader</th>
+                        <th>BDCs</th>
+                        <th>Coaching</th>
+                        <th>Highlights</th>
+                        <th>Lowlights</th>
+                        <th>Plan Tomorrow</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="entriesBody"></tbody>
+            </table>
+            <div id="noEntries" class="no-data">No entries yet. Start entering data via the Daily EOD Entry form!</div>
+            
+            <div class="actions">
+                <button class="btn-download" onclick="downloadCSV()">⬇ Download as CSV</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycbyjd7xGNV1Sw5c1NEr8OqBUbZEQu5Wo1JfrqyE5NtL2tc9M0TlLKDw2n-DscgdVFRJPHA/exec';
+        const METRICS_KEY = 'team-metrics-data';
+        const GOALS_KEY = 'monthly-goals';
+        let allData = [];
+        let bdcChart, coachingChart;
+        
+        window.addEventListener('load', () => {
+            document.getElementById('dashboardMonth').value = '2026-04';
+            loadData();
+            displayMetrics();
+            setInterval(loadData, 5000); // Refresh every 5 seconds
+        });
+        
+        function loadData() {
+            fetch(API_URL)
+                .then(response => response.json())
+                .then(data => {
+                    allData = data.map((item, index) => ({
+                        id: index,
+                        date: item.date || '',
+                        team: item.team || '',
+                        leader: item.leader || '',
+                        bdc: parseInt(item.bdc) || 0,
+                        coaching: parseInt(item.coaching) || 0,
+                        highlights: item.highlights || '',
+                        lowlights: item.lowlights || '',
+                        planTomorrow: item.planTomorrow || ''
+                    }));
+                    
+                    updateDashboard();
+                    populateEntries();
+                })
+                .catch(error => {
+                    console.log('Data refresh error:', error);
+                });
+        }
+        
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'dashboard') updateDashboard();
+            else if (tabName === 'entries') populateEntries();
+            else if (tabName === 'reports') generateReports();
+        }
+        
+        function updateDashboard() {
+            const selectedMonth = document.getElementById('dashboardMonth').value || '2026-04';
+            
+            const monthNames = {
+                '2026-04': 'April 2026',
+                '2026-05': 'May 2026',
+                '2026-06': 'June 2026',
+                '2026-07': 'July 2026',
+                '2026-08': 'August 2026',
+                '2026-09': 'September 2026',
+                '2026-10': 'October 2026',
+                '2026-11': 'November 2026',
+                '2026-12': 'December 2026'
+            };
+            document.getElementById('monthDisplay').textContent = monthNames[selectedMonth];
+            
+            const filtered = allData.filter(e => e.date && e.date.startsWith(selectedMonth));
+            
+            const totalBDC = filtered.reduce((sum, e) => sum + e.bdc, 0);
+            const totalCoaching = filtered.reduce((sum, e) => sum + e.coaching, 0);
+            const teams = new Set(filtered.map(e => e.team)).size;
+            
+            document.getElementById('totalBDC').textContent = totalBDC;
+            document.getElementById('totalCoaching').textContent = totalCoaching;
+            document.getElementById('totalEntries').textContent = filtered.length;
+            document.getElementById('activeTeams').textContent = teams;
+            
+            const metricsMap = {};
+            const metrics = JSON.parse(localStorage.getItem(METRICS_KEY) || '[]');
+            metrics.forEach(m => {
+                metricsMap[m.team] = m;
+            });
+            
+            const teams_data = {};
+            ['RitchCent', 'Jumhon', 'Jetlica'].forEach(team => {
+                teams_data[team] = {
+                    bdc: filtered.filter(e => e.team === team).reduce((sum, e) => sum + e.bdc, 0),
+                    coaching: filtered.filter(e => e.team === team).reduce((sum, e) => sum + e.coaching, 0),
+                    leaders: {}
+                };
+                
+                filtered.filter(e => e.team === team).forEach(e => {
+                    if (!teams_data[team].leaders[e.leader]) {
+                        teams_data[team].leaders[e.leader] = 0;
+                    }
+                    teams_data[team].leaders[e.leader] += e.coaching;
+                });
+            });
+            
+            ['RitchCent', 'Jumhon', 'Jetlica'].forEach(team => {
+                document.getElementById(`bdc${team}`).textContent = teams_data[team].bdc;
+                document.getElementById(`coaching${team}`).textContent = teams_data[team].coaching;
+                
+                const teamMetrics = metricsMap[team];
+                if (teamMetrics) {
+                    document.getElementById(`leads${team}`).textContent = teamMetrics.avgLeadsPerDay;
+                    document.getElementById(`dials${team}`).textContent = teamMetrics.dialsPerDay;
+                    document.getElementById(`conversion${team}`).textContent = teamMetrics.conversionRate + '%';
+                } else {
+                    document.getElementById(`leads${team}`).textContent = '-';
+                    document.getElementById(`dials${team}`).textContent = '-';
+                    document.getElementById(`conversion${team}`).textContent = '-';
+                }
+                
+                const leadersHtml = Object.entries(teams_data[team].leaders)
+                    .map(([leader, coaching]) => `
+                        <div class="leader-item">
+                            <div class="leader-name">${leader}</div>
+                            <div class="leader-stat">Coaching: ${coaching} sessions</div>
+                        </div>
+                    `).join('');
+                
+                document.getElementById(`leaders${team}`).innerHTML = leadersHtml || '<div class="no-data">No data</div>';
+            });
+            
+            updateGoalDisplay(selectedMonth, totalBDC);
+        }
+        
+        function generateReports() {
+            const selectedMonth = document.getElementById('dashboardMonth').value || '2026-04';
+            const filtered = allData.filter(e => e.date && e.date.startsWith(selectedMonth));
+            
+            const bdcData = {
+                RitchCent: filtered.filter(e => e.team === 'RitchCent').reduce((sum, e) => sum + e.bdc, 0),
+                Jumhon: filtered.filter(e => e.team === 'Jumhon').reduce((sum, e) => sum + e.bdc, 0),
+                Jetlica: filtered.filter(e => e.team === 'Jetlica').reduce((sum, e) => sum + e.bdc, 0)
+            };
+            
+            const coachingData = {
+                RitchCent: filtered.filter(e => e.team === 'RitchCent').reduce((sum, e) => sum + e.coaching, 0),
+                Jumhon: filtered.filter(e => e.team === 'Jumhon').reduce((sum, e) => sum + e.coaching, 0),
+                Jetlica: filtered.filter(e => e.team === 'Jetlica').reduce((sum, e) => sum + e.coaching, 0)
+            };
+            
+            if (bdcChart) bdcChart.destroy();
+            if (coachingChart) coachingChart.destroy();
+            
+            const bdcCtx = document.getElementById('bdcChart').getContext('2d');
+            bdcChart = new Chart(bdcCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['RitchCent', 'Jumhon', 'Jetlica'],
+                    datasets: [{
+                        label: 'Total BDCs',
+                        data: [bdcData.RitchCent, bdcData.Jumhon, bdcData.Jetlica],
+                        backgroundColor: ['#1e3c72', '#2a5298', '#3b7dd9'],
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+            
+            const coachingCtx = document.getElementById('coachingChart').getContext('2d');
+            coachingChart = new Chart(coachingCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['RitchCent', 'Jumhon', 'Jetlica'],
+                    datasets: [{
+                        label: 'Total Coaching Sessions',
+                        data: [coachingData.RitchCent, coachingData.Jumhon, coachingData.Jetlica],
+                        backgroundColor: ['#10b981', '#059669', '#047857'],
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+            
+            const leaders = {};
+            filtered.forEach(e => {
+                if (!leaders[e.leader]) {
+                    leaders[e.leader] = { team: e.team, coaching: 0, bdc: 0 };
+                }
+                leaders[e.leader].coaching += e.coaching;
+                leaders[e.leader].bdc += e.bdc;
+            });
+            
+            const rankings = Object.entries(leaders)
+                .map(([name, stats]) => ({ name, ...stats }))
+                .sort((a, b) => b.coaching - a.coaching);
+            
+            const rankingBody = document.getElementById('rankingBody');
+            rankingBody.innerHTML = rankings
+                .map((leader, index) => `
+                    <tr>
+                        <td><span class="rank-badge">${index + 1}</span></td>
+                        <td><strong>${leader.name}</strong></td>
+                        <td>${leader.team}</td>
+                        <td>${leader.coaching}</td>
+                        <td>${leader.bdc}</td>
+                    </tr>
+                `).join('');
+        }
+        
+        function populateEntries() {
+            const tbody = document.getElementById('entriesBody');
+            const adminMode = sessionStorage.getItem('admin-mode-active') === 'true';
+            
+            if (allData.length === 0) {
+                document.getElementById('noEntries').style.display = 'block';
+                tbody.innerHTML = '';
+                return;
+            }
+            
+            document.getElementById('noEntries').style.display = 'none';
+            tbody.innerHTML = allData.slice().reverse()
+                .map(e => `
+                    <tr>
+                        <td>${e.date}</td>
+                        <td>${e.team}</td>
+                        <td>${e.leader}</td>
+                        <td>${e.bdc}</td>
+                        <td>${e.coaching}</td>
+                        <td><small>${e.highlights || '-'}</small></td>
+                        <td><small>${e.lowlights || '-'}</small></td>
+                        <td><small>${e.planTomorrow || '-'}</small></td>
+                        <td>${adminMode ? `<button class="btn-delete" onclick="deleteEntry(${e.id})">Delete</button>` : '<span style="color: #9ca3af; font-size: 12px;">🔒 Locked</span>'}</td>
+                    </tr>
+                `).join('');
+        }
+        
+        function deleteEntry(id) {
+            const adminMode = sessionStorage.getItem('admin-mode-active') === 'true';
+            if (!adminMode) {
+                alert('Delete access is locked. Click "Unlock Deletes" first.');
+                return;
+            }
+            alert('Manual delete not available with Google Sheets. Please delete directly from the Google Sheet.');
+        }
+        
+        function downloadCSV() {
+            if (allData.length === 0) {
+                alert('No data to download');
+                return;
+            }
+            
+            const headers = 'Date,Team,Team Leader Name,Booked Discovery Calls,Coaching Sessions Done,Highlights,Lowlights,Plan for Tomorrow\n';
+            const rows = allData.map(e => `${e.date},${e.team},${e.leader},${e.bdc},${e.coaching},"${e.highlights || ''}","${e.lowlights || ''}","${e.planTomorrow || ''}"`).join('\n');
+            const csv = headers + rows;
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `team-sales-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+        
+        function downloadReport() {
+            const selectedMonth = document.getElementById('dashboardMonth').value || '2026-04';
+            const filtered = allData.filter(e => e.date && e.date.startsWith(selectedMonth));
+            
+            const bdcData = {
+                RitchCent: filtered.filter(e => e.team === 'RitchCent').reduce((sum, e) => sum + e.bdc, 0),
+                Jumhon: filtered.filter(e => e.team === 'Jumhon').reduce((sum, e) => sum + e.bdc, 0),
+                Jetlica: filtered.filter(e => e.team === 'Jetlica').reduce((sum, e) => sum + e.bdc, 0)
+            };
+            
+            const coachingData = {
+                RitchCent: filtered.filter(e => e.team === 'RitchCent').reduce((sum, e) => sum + e.coaching, 0),
+                Jumhon: filtered.filter(e => e.team === 'Jumhon').reduce((sum, e) => sum + e.coaching, 0),
+                Jetlica: filtered.filter(e => e.team === 'Jetlica').reduce((sum, e) => sum + e.coaching, 0)
+            };
+            
+            const totalBDC = Object.values(bdcData).reduce((a, b) => a + b, 0);
+            const totalCoaching = Object.values(coachingData).reduce((a, b) => a + b, 0);
+            
+            const report = `PERFORMANCE REPORT
+Generated: ${new Date().toLocaleString()}
+
+SUMMARY
+-------
+Total BDCs: ${totalBDC}
+Total Coaching Sessions: ${totalCoaching}
+Total Entries: ${filtered.length}
+
+TEAM BREAKDOWN
+--------------
+RitchCent: ${bdcData.RitchCent} BDCs, ${coachingData.RitchCent} Coaching Sessions
+Jumhon: ${bdcData.Jumhon} BDCs, ${coachingData.Jumhon} Coaching Sessions
+Jetlica: ${bdcData.Jetlica} BDCs, ${coachingData.Jetlica} Coaching Sessions
+`;
+            
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `performance-report-${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            document.querySelector('.upload-area').style.background = '#f0f4f9';
+        }
+        
+        function handleDragLeave(e) {
+            document.querySelector('.upload-area').style.background = '#f9fafb';
+        }
+        
+        function handleMetricsDrop(e) {
+            e.preventDefault();
+            document.querySelector('.upload-area').style.background = '#f9fafb';
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('metricsFile').files = files;
+                handleMetricsFileSelect({ target: { files } });
+            }
+        }
+        
+        function handleMetricsFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('metricsFileInfo').innerHTML = `<div class="file-info">✓ Selected: ${file.name} (${(file.size / 1024).toFixed(2)} KB)</div>`;
+            }
+        }
+        
+        function processMetricsFile() {
+            const file = document.getElementById('metricsFile').files[0];
+            if (!file) {
+                showMessage('metricsMsg', 'Please select a CSV file', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const csv = e.target.result;
+                    const lines = csv.trim().split('\n');
+                    
+                    if (lines.length < 2) {
+                        showMessage('metricsMsg', 'CSV must have header row and data', 'error');
+                        return;
+                    }
+                    
+                    const metrics = [];
+                    for (let i = 1; i < lines.length; i++) {
+                        const values = lines[i].split(',').map(v => v.trim());
+                        if (values.length >= 4 && values[0]) {
+                            metrics.push({
+                                team: values[0],
+                                avgLeadsPerDay: parseFloat(values[1]) || 0,
+                                dialsPerDay: parseFloat(values[2]) || 0,
+                                conversionRate: parseFloat(values[3]) || 0
+                            });
+                        }
+                    }
+                    
+                    if (metrics.length === 0) {
+                        showMessage('metricsMsg', 'No valid data found in CSV', 'error');
+                        return;
+                    }
+                    
+                    localStorage.setItem(METRICS_KEY, JSON.stringify(metrics));
+                    
+                    showMessage('metricsMsg', `✓ Successfully loaded ${metrics.length} team metrics!`, 'success');
+                    document.getElementById('metricsFile').value = '';
+                    document.getElementById('metricsFileInfo').innerHTML = '';
+                    
+                    displayMetrics();
+                    updateDashboard();
+                    
+                } catch (error) {
+                    showMessage('metricsMsg', 'Error parsing CSV: ' + error.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        function displayMetrics() {
+            const metrics = JSON.parse(localStorage.getItem(METRICS_KEY) || '[]');
+            const tbody = document.getElementById('metricsBody');
+            
+            if (metrics.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #9ca3af;">No metrics uploaded yet</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = metrics.map(m => `
+                <tr>
+                    <td><strong>${m.team}</strong></td>
+                    <td>${m.avgLeadsPerDay}</td>
+                    <td>${m.dialsPerDay}</td>
+                    <td>${m.conversionRate}%</td>
+                    <td><button class="btn-delete" onclick="deleteMetric('${m.team}')">Delete</button></td>
+                </tr>
+            `).join('');
+        }
+        
+        function deleteMetric(team) {
+            if (confirm(`Delete metrics for ${team}?`)) {
+                let metrics = JSON.parse(localStorage.getItem(METRICS_KEY) || '[]');
+                metrics = metrics.filter(m => m.team !== team);
+                localStorage.setItem(METRICS_KEY, JSON.stringify(metrics));
+                displayMetrics();
+                updateDashboard();
+            }
+        }
+        
+        function openGoalModal() {
+            const selectedMonth = document.getElementById('dashboardMonth').value || '2026-04';
+            const monthNames = {
+                '2026-04': 'April 2026',
+                '2026-05': 'May 2026',
+                '2026-06': 'June 2026',
+                '2026-07': 'July 2026',
+                '2026-08': 'August 2026',
+                '2026-09': 'September 2026',
+                '2026-10': 'October 2026',
+                '2026-11': 'November 2026',
+                '2026-12': 'December 2026'
+            };
+            
+            document.getElementById('modalMonthDisplay').textContent = monthNames[selectedMonth];
+            
+            const goals = JSON.parse(localStorage.getItem(GOALS_KEY) || '{}');
+            const currentGoal = goals[selectedMonth] || '';
+            document.getElementById('goalInput').value = currentGoal;
+            
+            document.getElementById('goalModal').style.display = 'block';
+        }
+        
+        function closeGoalModal() {
+            document.getElementById('goalModal').style.display = 'none';
+        }
+        
+        function saveGoal() {
+            const selectedMonth = document.getElementById('dashboardMonth').value || '2026-04';
+            const goalValue = parseInt(document.getElementById('goalInput').value) || 0;
+            
+            if (goalValue <= 0) {
+                alert('Please enter a valid goal amount');
+                return;
+            }
+            
+            let goals = JSON.parse(localStorage.getItem(GOALS_KEY) || '{}');
+            goals[selectedMonth] = goalValue;
+            localStorage.setItem(GOALS_KEY, JSON.stringify(goals));
+            
+            closeGoalModal();
+            updateDashboard();
+            showMessage('metricsMsg', '✓ Goal saved successfully!', 'success');
+        }
+        
+        function updateGoalDisplay(selectedMonth, totalBDC) {
+            const monthNames = {
+                '2026-04': 'April 2026',
+                '2026-05': 'May 2026',
+                '2026-06': 'June 2026',
+                '2026-07': 'July 2026',
+                '2026-08': 'August 2026',
+                '2026-09': 'September 2026',
+                '2026-10': 'October 2026',
+                '2026-11': 'November 2026',
+                '2026-12': 'December 2026'
+            };
+            
+            document.getElementById('goalMonthDisplay').textContent = monthNames[selectedMonth];
+            
+            const goals = JSON.parse(localStorage.getItem(GOALS_KEY) || '{}');
+            const goal = goals[selectedMonth];
+            
+            document.getElementById('actualBDCs').textContent = totalBDC;
+            
+            if (!goal) {
+                document.getElementById('goalAmount').textContent = '-';
+                document.getElementById('goalPercentage').textContent = '-';
+                document.getElementById('goalStatus').textContent = 'Set a goal to track progress';
+                document.getElementById('progressBar').style.width = '0%';
+                return;
+            }
+            
+            document.getElementById('goalAmount').textContent = goal;
+            
+            const percentage = Math.min(Math.round((totalBDC / goal) * 100), 100);
+            document.getElementById('goalPercentage').textContent = percentage + '%';
+            document.getElementById('progressBar').style.width = percentage + '%';
+            
+            const remaining = Math.max(0, goal - totalBDC);
+            if (percentage >= 100) {
+                document.getElementById('goalStatus').textContent = `🎉 Goal achieved! ${totalBDC}/${goal} BDCs`;
+            } else {
+                document.getElementById('goalStatus').textContent = `${remaining} BDCs remaining to reach goal`;
+            }
+        }
+        
+        function unlockAdminMode() {
+            const password = prompt('Enter admin password to unlock deletes:');
+            if (password === null) return;
+            
+            const correctPassword = 'admin123';
+            
+            if (password === correctPassword) {
+                sessionStorage.setItem('admin-mode-active', 'true');
+                document.getElementById('adminUnlockBtn').style.display = 'none';
+                document.getElementById('adminLockBtn').style.display = 'block';
+                populateEntries();
+                showMessage('metricsMsg', '✓ Delete access unlocked!', 'success');
+            } else {
+                alert('❌ Incorrect password');
+            }
+        }
+        
+        function lockAdminMode() {
+            sessionStorage.removeItem('admin-mode-active');
+            document.getElementById('adminUnlockBtn').style.display = 'block';
+            document.getElementById('adminLockBtn').style.display = 'none';
+            populateEntries();
+            showMessage('metricsMsg', '✓ Delete access locked', 'success');
+        }
+        
+        function showMessage(elementId, text, type) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="msg ${type}-msg">${text}</div>`;
+            setTimeout(() => { element.innerHTML = ''; }, 4000);
+        }
+        
+        window.onclick = function(event) {
+            const modal = document.getElementById('goalModal');
+            if (event.target == modal) {
+                closeGoalModal();
+            }
+        }
+    </script>
+</body>
+</html>
